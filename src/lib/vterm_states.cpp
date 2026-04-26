@@ -49,7 +49,7 @@ const VTerm::Sequence VTerm::escape_sequences[] = {
 	{ (u16)-1 },
 
 	// ESesc
-
+	{ '[', &VTerm::clear_param,	ESsquare },
 	{ ']', &VTerm::enter_string_state,	ESstring },
 	{ '%', 0,	ESpercent },
 	{ '#', 0,	EShash },
@@ -69,7 +69,6 @@ const VTerm::Sequence VTerm::escape_sequences[] = {
 	{ 'X', &VTerm::enter_string_state,	ESstring },
 	{ '^', &VTerm::enter_string_state,	ESstring },
 	{ '_', &VTerm::enter_string_state,	ESstring },
-	{ ']', &VTerm::enter_string_state,	ESstring },
 	{ (u16)-1 },
 
 	// ESsquare
