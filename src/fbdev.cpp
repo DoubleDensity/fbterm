@@ -100,19 +100,47 @@ FbDev::FbDev()
 		bool ypan = (vinfo.yres_virtual > vinfo.yres && finfo.ypanstep && !(FH(1) % finfo.ypanstep));
 		bool ywrap = (finfo.ywrapstep && !(FH(1) % finfo.ywrapstep));
 		if (ywrap && !(vinfo.vmode & FB_VMODE_YWRAP)) {
-			vinfo.vmode |= FB_VMODE_YWRAP;
+			// Try to force YWRAP mode for hardware panning
+			vinfo.yres_virtual = vinfo.yres * 2;
 			ioctl(fbdev_fd, FBIOPUT_VSCREENINFO, &vinfo);
-			ywrap = (vinfo.vmode & FB_VMODE_YWRAP);
+			// Re-check if YWRAP is now available
+			ywrap = (finfo.ywrapstep && !(FH(1) % finfo.ywrapstep));
+			ioctl(fbdev_fd, FBIOGET_VSCREENINFO, &vinfo);
 		}
 
 		if ((ypan || ywrap) && !ioctl(fbdev_fd, FBIOPAN_DISPLAY, &vinfo)) {
+			// Successfully enabled hardware panning
 			if (ywrap) {
 				mScrollType = YWrap;
 				mOffsetMax = vinfo.yres_virtual - 1;
-			} else {
+			} else if (ypan) {
 				mScrollType = YPan;
 				mOffsetMax = vinfo.yres_virtual - vinfo.yres;
 			}
+		} else {
+			// Hardware panning failed, try to allocate double buffer for optimized memmove
+			if (vinfo.yres_virtual < vinfo.yres * 2) {
+				vinfo.yres_virtual = vinfo.yres * 2;
+				if (!ioctl(fbdev_fd, FBIOPUT_VSCREENINFO, &vinfo)) {
+					// Successfully allocated double buffer, use optimized scrolling
+					mScrollType = YPan;
+					mOffsetMax = vinfo.yres_virtual - vinfo.yres;
+				} else {
+					// Fall back to redraw mode
+					mScrollType = Redraw;
+					mOffsetMax = 0;
+				}
+			} else {
+				mScrollType = Redraw;
+				mOffsetMax = 0;
+			}
+		}
+
+		// If hardware panning is available, ensure we can use it
+		if (mScrollType == YPan || mScrollType == YWrap) {
+			// Verify panning works
+			s32 test_offset = mOffsetCur;
+			setupOffset();
 		}
 	}
 }

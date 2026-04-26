@@ -150,6 +150,28 @@ bool Screen::move(u16 scol, u16 srow, u16 dcol, u16 drow, u16 w, u16 h)
 	u16 top = MIN(srow, drow), bot = MAX(srow, drow) + h;
 	u16 left = scol, right = scol + w;
 
+	// Optimize for full-width scrolls (common case for terminal scrolling)
+	if (scol == 0 && w == mCols) {
+		// Full-width scroll - use hardware panning if available
+		if (mScrollType == YPan || mScrollType == YWrap) {
+			// Calculate offset for hardware panning
+			if (mScrollType == YPan || mScrollType == YWrap) {
+				mOffsetCur += FH((s32)srow - drow);
+
+				if (mOffsetCur < 0) mOffsetCur = mOffsetMax;
+				else if ((u32)mOffsetCur > mOffsetMax)
+					mOffsetCur = 0;
+				setupOffset();
+			}
+
+			if (top) redraw(0, 0, mCols, top);
+			if (bot < mRows) redraw(0, bot, mCols, mRows - bot);
+
+			eraseMargin(drow > srow, drow > srow ? (drow - srow) : (srow - drow));
+			return true;
+		}
+	}
+
 	u32 noaccel_redraw_area = w * (bot - top - 1);
 	u32 accel_redraw_area = mCols * mRows - w * h;
 
@@ -194,6 +216,13 @@ void Screen::eraseMargin(bool top, u16 h)
 
 	if (mHeight % FH(1)) {
 		fillRect(0, FH(mRows), mWidth, mHeight % FH(1), 0);
+	}
+
+	// Optimize margin erasing for full-width scrolls
+	if (mWidth == FW(mCols) && h == mRows) {
+		// Full screen clear - use optimized memset
+		memset(mVMemBase, 0, mBytesPerLine * mHeight);
+		return;
 	}
 }
 
