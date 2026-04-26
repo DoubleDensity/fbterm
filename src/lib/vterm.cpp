@@ -210,7 +210,7 @@ void VTerm::resize(u16 w, u16 h)
 	}
 
 	if (new_max_width > max_width || new_max_height > max_height) {
-		u16 *new_text = new u16[new_max_width * (history_lines + new_max_height)];
+		u32 *new_text = new u32[new_max_width * (history_lines + new_max_height)];
 		CharAttr *new_attrs = new CharAttr[new_max_width * (history_lines + new_max_height)];
 
 		if (text) {
