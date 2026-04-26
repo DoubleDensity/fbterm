@@ -24,6 +24,7 @@
 #include "font.h"
 #include "screen.h"
 #include "fbconfig.h"
+#include <map>
 
 #define OFFSET(TYPE, MEMBER) ((size_t)(&(((TYPE *)0)->MEMBER)))
 #define SUBS(a, b) ((a) > (b) ? (a) - (b) : (b) - (a))
@@ -36,8 +37,7 @@ static FT_Library ftlib;
 static FT_Face *fontFaces;
 static u32 *fontFlags;
 
-static Font::Glyph **glyphCache;
-static bool *glyphCacheInited;
+static std::map<u32, Font::Glyph *> glyphCache;
 
 static void openFont(u32 index);
 
@@ -111,9 +111,7 @@ Font::Font()
 	fontFlags = new u32[fontList->nfont];
 	memset(fontFaces, 0, sizeof(FT_Face) * fontList->nfont);
 
-	glyphCache = new Glyph *[256 * 256];
-	glyphCacheInited = new bool[256];
-	memset(glyphCacheInited, 0, sizeof(bool) * 256);
+	// Use dynamic map to support full Unicode range (including above 0xFFFF for Nerd Fonts)
 
 	FT_Init_FreeType(&ftlib);
 	openFont(0);
@@ -181,18 +179,10 @@ Font::Font()
 
 Font::~Font()
 {
-	for (u32 i = 0; i < 256; i++) {
-		if (!glyphCacheInited[i]) continue;
-
-		for (u32 j = 0; j < 256; j++) {
-			if (glyphCache[i * 256 + j]) {
-				delete[] (u8 *)glyphCache[i * 256 + j];
-			}
-		}
+	for (auto &entry : glyphCache) {
+		if (entry.second) delete[] (u8 *)entry.second;
 	}
-
-	delete[] glyphCache;
-	delete[] glyphCacheInited;
+	glyphCache.clear();
 
 	for (u32 i = 0; i < fontList->nfont; i++) {
 		if (fontFaces[i] && fontFaces[i] != (FT_Face)-1) {
@@ -290,14 +280,8 @@ static int fontIndex(u32 unicode)
 
 Font::Glyph *Font::getGlyph(u32 unicode)
 {
-	if (unicode >= 256 * 256) return 0;
-
-	if (!glyphCacheInited[unicode >> 8]) {
-		glyphCacheInited[unicode >> 8] = true;
-		memset(&glyphCache[unicode & 0xff00], 0, sizeof(Glyph *) * 256);
-	}
-
-	if (glyphCache[unicode]) return glyphCache[unicode];
+	auto it = glyphCache.find(unicode);
+	if (it != glyphCache.end()) return it->second;
 
 	int i = fontIndex(unicode);
 	if (i == -1) return 0;

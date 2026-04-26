@@ -446,8 +446,6 @@ void VTerm::input(const u8 *buf, u32 count)
 
 void VTerm::do_normal_char()
 {
-	if (cur_char > 0xffff) cur_char = 0xfffd;
-
 	s32 cw = charWidth(cur_char);
 	if (cw <= 0) return;
 
