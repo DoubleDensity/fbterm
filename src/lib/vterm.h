@@ -172,6 +172,7 @@ private:
 	void reset_palette();
 	void set_led();
 	void fbterm_specific();
+	void enter_string_state();
 
 	CharAttr normal_char_attr();
 	CharAttr erase_char_attr();
@@ -185,7 +186,7 @@ private:
 	static bool init_ambiguous_wide();
 
 	typedef enum {
-		ESnormal = 0, ESesc, ESsquare, ESnonstd, ESpercent, EScharset, EShash, ESfunckey, ESkeep
+		ESnormal = 0, ESesc, ESsquare, ESnonstd, ESpercent, EScharset, EShash, ESfunckey, ESstring, ESkeep
 	} EscapeState;
 
 	EscapeState esc_state;
@@ -266,6 +267,10 @@ private:
 	#define NPAR 16
 	u16 npar, param[NPAR];
 	bool q_mode, palette_mode;
+
+	// string consuming state
+	bool mExpectST;
+	u32 prev_char;
 
 	//history
 	static u16 history_lines;

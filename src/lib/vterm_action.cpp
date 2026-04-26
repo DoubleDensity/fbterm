@@ -652,6 +652,20 @@ void VTerm::begin_set_palette()
 	else palette_mode = true;
 }
 
+void VTerm::reset()
+{
+	utf8 = true;
+	utf8_count = 0;
+	g0_is_active = true;
+	g0_charset = Lat1Map;
+	g1_charset = GrafMap;
+	charset = g0_charset;
+
+	esc_state = ESnormal;
+	mExpectST = false;
+
+	pending_scroll = 0;
+
 void VTerm::set_palette()
 {
 	if (palette_mode) {
@@ -679,6 +693,14 @@ void VTerm::reset_palette()
 void VTerm::set_led()
 {
 	request(param[0] ? LedSet : LedClear,  param[0]);
+}
+
+void VTerm::enter_string_state()
+{
+	/* Enter string consuming state (DCS, SOS, PM, APC, OSC).
+	 * All characters are swallowed until ST (ESC \ or 0x9C) is received.
+	 * OSC is also commonly terminated by BEL (0x07). */
+	mExpectST = true;
 }
 
 void VTerm::fbterm_specific()

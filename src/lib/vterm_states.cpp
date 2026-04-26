@@ -65,6 +65,10 @@ const VTerm::Sequence VTerm::escape_sequences[] = {
 	{ '8', &VTerm::restore_cursor,	ESnormal },
 	{ '>', &VTerm::keypad_numeric,	ESnormal },
 	{ '=', &VTerm::keypad_application,	ESnormal },
+	{ 'P', &VTerm::enter_string_state,	ESstring },
+	{ 'X', &VTerm::enter_string_state,	ESstring },
+	{ '^', &VTerm::enter_string_state,	ESstring },
+	{ '_', &VTerm::enter_string_state,	ESstring },
 	{ (u16)-1 },
 
 	// ESsquare
@@ -112,6 +116,9 @@ const VTerm::Sequence VTerm::escape_sequences[] = {
 	{ 'a' | ADDSAME(5), &VTerm::set_palette,    ESkeep },
 	{ 'P', &VTerm::begin_set_palette, ESkeep },
 	{ 'R', &VTerm::reset_palette, ESnormal },
+	{ (u16)-1 },
+
+	// ESstring
 	{ (u16)-1 },
 
 	// ESpercent
