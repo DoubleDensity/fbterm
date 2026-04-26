@@ -102,7 +102,11 @@ FbDev::FbDev()
 		if (ywrap && !(vinfo.vmode & FB_VMODE_YWRAP)) {
 			// Try to force YWRAP mode for hardware panning
 			vinfo.yres_virtual = vinfo.yres * 2;
-			ioctl(fbdev_fd, FBIOPUT_VSCREENINFO, &vinfo);
+			vinfo.vmode |= FB_VMODE_YWRAP;
+			if (!ioctl(fbdev_fd, FBIOPUT_VSCREENINFO, &vinfo)) {
+				ioctl(fbdev_fd, FBIOGET_FSCREENINFO, &finfo);
+				mBytesPerLine = finfo.line_length;
+			}
 			// Re-check if YWRAP is now available
 			ywrap = (finfo.ywrapstep && !(FH(1) % finfo.ywrapstep));
 			ioctl(fbdev_fd, FBIOGET_VSCREENINFO, &vinfo);
@@ -122,7 +126,10 @@ FbDev::FbDev()
 			if (vinfo.yres_virtual < vinfo.yres * 2) {
 				vinfo.yres_virtual = vinfo.yres * 2;
 				if (!ioctl(fbdev_fd, FBIOPUT_VSCREENINFO, &vinfo)) {
-					// Successfully allocated double buffer, use optimized scrolling
+					// Successfully allocated double buffer, refresh info
+					ioctl(fbdev_fd, FBIOGET_FSCREENINFO, &finfo);
+					mBytesPerLine = finfo.line_length;
+					
 					mScrollType = YPan;
 					mOffsetMax = vinfo.yres_virtual - vinfo.yres;
 				} else {

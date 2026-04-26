@@ -89,10 +89,6 @@ public:
 
 	static s32 charWidth(u32 ucs);
 
-	// Batch rendering control for jump scrolling optimization
-	void setBatchMode(bool enabled) { mBatchMode = enabled; }
-	void flushBatch();
-
 protected:
 	virtual void drawChars(CharAttr attr, u16 x, u16 y, u16 w, u16 num, u32 *chars, bool *dws) = 0;
 	virtual bool moveChars(u16 sx, u16 sy, u16 dx, u16 dy, u16 w, u16 h) { return false; }
@@ -237,11 +233,6 @@ private:
 	u16 width, height, max_width, max_height;
 	u16 scroll_top, scroll_bot;
 	s32 pending_scroll; // >0 means scroll up
-
-	// Batch rendering state for jump scrolling optimization
-	bool mBatchMode;
-	u16 mBatchScrollTop, mBatchScrollBot;
-	s32 mBatchPendingScroll;
 
 	// terminal state
 	struct ModeFlag {

@@ -115,8 +115,6 @@ VTerm::VTerm(u16 w, u16 h)
 	history_save_line = 0;
 	visual_start_line = 0;
 
-	mBatchMode = false;
-
 	reset();
 	resize(w, h);
 }
@@ -289,7 +287,6 @@ void VTerm::input(const u8 *buf, u32 count)
 	if (!width) return;
 
 	if (visual_start_line != total_history_lines()) {
-		flushBatch();
 		historyDisplay(true, total_history_lines());
 		historyChanged(visual_start_line, total_history_lines());
 	}
@@ -447,23 +444,10 @@ void VTerm::input(const u8 *buf, u32 count)
 		}
 
 		do_control_char();
-		// In batch mode, defer updates until end of input burst
-		if (mBatchMode) {
-			continue;
-		}
 	}
 
 	update();
 	draw_cursor();
-}
-
-void VTerm::flushBatch()
-{
-	if (mBatchMode) {
-		mBatchMode = false;
-		update();
-		draw_cursor();
-	}
 }
 
 void VTerm::do_normal_char()
@@ -535,12 +519,6 @@ void VTerm::update()
 	if (!width) return;
 
 	// first perform scroll-copy
-	if (mBatchMode) {
-		// In batch mode, accumulate scroll operations
-		if (pending_scroll) mBatchPendingScroll += pending_scroll;
-		pending_scroll = 0;
-		return;
-	}
 	s32 mx = scroll_bot - scroll_top + 1;
 	if (pending_scroll && pending_scroll< mx && -pending_scroll < mx) {
 		u16 sy, dy, h;
@@ -666,12 +644,6 @@ void VTerm::scroll_region(u16 start_y, u16 end_y, s16 num)
 
 	if (start_y == 0 && num > 0) {
 		history_scroll(num);
-	}
-
-	if (mBatchMode) {
-		// In batch mode, accumulate scroll operations
-		mBatchPendingScroll += num;
-		return;
 	}
 
 	fast_scroll = (start_y == scroll_top && end_y == scroll_bot);
