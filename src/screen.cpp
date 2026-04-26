@@ -312,6 +312,8 @@ void Screen::drawGlyph(u32 x, u32 y, u8 fc, u8 bc, u16 code, bool dw)
 	y += top;
 	if (x >= mWidth || y >= mHeight || !width || !height) return;
 
+	fillRect(x, y, width, height, bc);
+
 	u32 nwidth = width, nheight = height;
 	rotateRect(x, y, nwidth, nheight);
 
