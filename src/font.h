@@ -30,11 +30,12 @@
 class Font {
 	DECLARE_INSTANCE(Font)
 public:
-	struct Glyph {
-		s16 pitch, width, height;
-		s16 left, top;
-		u8 pixmap[0];
-	};
+	    struct Glyph {
+	        s16 pitch, width, height;
+	        s16 left, top;
+	        bool is_color_bitmap;
+	        u8 pixmap[0];
+	    };
 
 	Glyph *getGlyph(u32 unicode);
 	u32 width() {

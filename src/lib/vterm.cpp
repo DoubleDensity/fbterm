@@ -49,7 +49,7 @@ VTerm::CharAttr VTerm::erase_char_attr()
 	CharAttr a(default_char_attr);
 
 	a.fcolor = char_attr.fcolor;
-	a.bcolor = 0;  // Use default background (black) instead of current bcolor to prevent color bleeding
+	a.bcolor = char_attr.bcolor;  // Use current background color to support BCE (Background Color Erase)
 	a.blink = char_attr.blink;
 
 	return a;

@@ -86,17 +86,17 @@ private:
 
 	void fillX(u32 x, u32 y, u32 w, u8 color);
 	void fillXBg(u32 x, u32 y, u32 w, u8 color);
-	void draw8(u32 x, u32 y, u32 w, u8 fc, u8 bc, u8 *pixmap);
-	void draw15(u32 x, u32 y, u32 w, u8 fc, u8 bc, u8 *pixmap);
-	void draw16(u32 x, u32 y, u32 w, u8 fc, u8 bc, u8 *pixmap);
-	void draw32(u32 x, u32 y, u32 w, u8 fc, u8 bc, u8 *pixmap);
-	void draw8Bg(u32 x, u32 y, u32 w, u8 fc, u8 bc, u8 *pixmap);
-	void draw15Bg(u32 x, u32 y, u32 w, u8 fc, u8 bc, u8 *pixmap);
-	void draw16Bg(u32 x, u32 y, u32 w, u8 fc, u8 bc, u8 *pixmap);
-	void draw32Bg(u32 x, u32 y, u32 w, u8 fc, u8 bc, u8 *pixmap);
+	void draw8(u32 x, u32 y, u32 w, u8 fc, u8 bc, u8 *pixmap, bool is_color = false);
+	void draw15(u32 x, u32 y, u32 w, u8 fc, u8 bc, u8 *pixmap, bool is_color = false);
+	void draw16(u32 x, u32 y, u32 w, u8 fc, u8 bc, u8 *pixmap, bool is_color = false);
+	void draw32(u32 x, u32 y, u32 w, u8 fc, u8 bc, u8 *pixmap, bool is_color = false);
+	void draw8Bg(u32 x, u32 y, u32 w, u8 fc, u8 bc, u8 *pixmap, bool is_color = false);
+	void draw15Bg(u32 x, u32 y, u32 w, u8 fc, u8 bc, u8 *pixmap, bool is_color = false);
+	void draw16Bg(u32 x, u32 y, u32 w, u8 fc, u8 bc, u8 *pixmap, bool is_color = false);
+	void draw32Bg(u32 x, u32 y, u32 w, u8 fc, u8 bc, u8 *pixmap, bool is_color = false);
 
 	typedef void (Screen::*fillFun)(u32 x, u32 y, u32 w, u8 color);
-	typedef void (Screen::*drawFun)(u32 x, u32 y, u32 w, u8 fc, u8 bc, u8 *pixmap);
+	typedef void (Screen::*drawFun)(u32 x, u32 y, u32 w, u8 fc, u8 bc, u8 *pixmap, bool is_color);
 
 	fillFun fill;
 	drawFun draw;

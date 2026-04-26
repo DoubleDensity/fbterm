@@ -317,21 +317,22 @@ void Screen::drawGlyph(u32 x, u32 y, u8 fc, u8 bc, u16 code, bool dw)
 
 	u8 *pixmap = glyph->pixmap;
 	u32 wdiff = glyph->width - width, hdiff = glyph->height - height;
+	u32 bytes_per_pixel = (glyph->is_color_bitmap ? 4 : 1);
 
 	if (wdiff) {
-		if (mRotateType == Rotate180) pixmap += wdiff;
+		if (mRotateType == Rotate180) pixmap += wdiff * bytes_per_pixel;
 		else if (mRotateType == Rotate270) pixmap += wdiff * glyph->pitch;
 	}
 
 	if (hdiff) {
-		if (mRotateType == Rotate90) pixmap += hdiff;
+		if (mRotateType == Rotate90) pixmap += hdiff * bytes_per_pixel;
 		else if (mRotateType == Rotate180) pixmap += hdiff * glyph->pitch;
 	}
 
 	adjustOffset(x, y);
 	for (; nheight--; y++, pixmap += glyph->pitch) {
 		if ((mScrollType == YWrap) && y > mOffsetMax) y -= mOffsetMax + 1;
-		(this->*draw)(x, y, nwidth, fc, bc, pixmap);
+		(this->*draw)(x, y, nwidth, fc, bc, pixmap, glyph->is_color_bitmap);
 	}
 }
 
