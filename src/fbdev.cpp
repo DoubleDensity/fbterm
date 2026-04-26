@@ -174,6 +174,11 @@ void FbDev::setupOffset()
 	ioctl(fbdev_fd, FBIOPAN_DISPLAY, &vinfo);
 }
 
+void FbDev::blank(bool on)
+{
+	ioctl(fbdev_fd, FBIOBLANK, on ? FB_BLANK_POWERDOWN : FB_BLANK_UNBLANK);
+}
+
 void FbDev::setupPalette(bool restore)
 {
 	if (finfo.visual == FB_VISUAL_TRUECOLOR || (!restore && !mPalette)) return;

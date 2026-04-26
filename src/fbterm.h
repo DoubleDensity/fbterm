@@ -31,14 +31,19 @@ public:
 	void exit() {
 		mRun = false;
 	}
+	void activityOccurred();
 	void processSysKey(u32 key);
 	void processSignal(u32 signo);
 	void initChildProcess();
 
 private:
 	void init();
+	void checkBlank();
 
 	bool mInit, mRun;
+	u32 mLastActivity;
+	u32 mBlankInterval;
+	bool mIsBlanked;
 };
 
 #endif

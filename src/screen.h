@@ -52,6 +52,7 @@ public :
 	void setPalette(const Color *palette);
 	
 	void enableScroll(bool enable) { mScrollEnable = enable; }
+	virtual void blank(bool on) {}
 
 	void showInfo(bool verbose);
 	virtual void switchVc(bool enter);

@@ -544,6 +544,14 @@ void FbShell::request(RequestType type,  u32 val)
 	case VcSwitch:
 		break;
 
+	case Blank:
+		if (active) screen->blank(true);
+		break;
+
+	case Unblank:
+		if (active) screen->blank(false);
+		break;
+
 	default:
 		break;
 	}
@@ -642,6 +650,7 @@ void FbShell::switchCodec(u8 index)
 
 void FbShell::keyInput(s8 *buf, u32 len)
 {
+	FbTerm::instance()->activityOccurred();
 	if (mImProxy && mImProxy->actived()) {
 		mImProxy->sendKey(buf, len);
 	} else {
@@ -651,6 +660,7 @@ void FbShell::keyInput(s8 *buf, u32 len)
 
 void FbShell::mouseInput(u16 x, u16 y, s32 type, s32 buttons)
 {
+	FbTerm::instance()->activityOccurred();
 	if (type == Move) {
 		clearMousePointer();
 

@@ -211,6 +211,9 @@ void Config::checkConfigFile(const s8 *name)
 		"\n"
 		"# set TERM to 'linux' instead of the default 'fbterm'\n"
 		"#term-is-linux=no\n"
+		"\n"
+		"# screen blank interval in minutes, 0 means disable it\n"
+		"screen-blank-interval=0\n"
 		;
 
 	struct stat cstat;
@@ -243,6 +246,7 @@ bool Config::parseArgs(s32 argc, s8 **argv)
 		{ "font-baseline", required_argument, 0, 'B' },
 		{ "ambiguous-wide", no_argument, 0, 'a' },
 		{ "term-is-linux", no_argument, 0, 'l' },
+		{ "screen-blank-interval", required_argument, 0, 'K' },
 #ifdef ENABLE_VESA
 		{ "vesa-mode", required_argument, 0, 0 },
 #endif
@@ -278,6 +282,7 @@ bool Config::parseArgs(s32 argc, s8 **argv)
 				"  -i, --input-method=TEXT         specify input method program\n"
 				"  -c, --cursor-shape=NUM          specify default cursor shape\n"
 				"  -C, --cursor-interval=NUM       specify cursor flash interval\n"
+				"  -K, --screen-blank-interval=NUM specify screen blank interval\n"
 #ifdef ENABLE_VESA
 				"      --vesa-mode=NUM             force VESA video mode\n"
 				"                  list            display available VESA video modes\n"

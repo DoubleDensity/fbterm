@@ -21,6 +21,7 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <signal.h>
+#include <time.h>
 #include <sys/ioctl.h>
 #include <sys/stat.h>
 #include <sys/wait.h>
@@ -101,6 +102,11 @@ DEFINE_INSTANCE_DEFAULT(FbTerm)
 FbTerm::FbTerm()
 {
 	mInit = false;
+	mLastActivity = time(0);
+	mBlankInterval = 0;
+	mIsBlanked = false;
+	Config::instance()->getOption("screen-blank-interval", mBlankInterval);
+
 	init();
 }
 
@@ -193,6 +199,7 @@ void FbTerm::processSignal(u32 signo)
 
 	case SIGALRM:
 		FbShellManager::instance()->drawCursor();
+		FbTerm::instance()->checkBlank();
 		break;
 
 	case SIGUSR1:
@@ -221,6 +228,25 @@ void FbTerm::processSignal(u32 signo)
 
 	default:
 		break;
+	}
+}
+
+void FbTerm::activityOccurred()
+{
+	mLastActivity = time(0);
+	if (mIsBlanked) {
+		mIsBlanked = false;
+		Screen::instance()->blank(false);
+	}
+}
+
+void FbTerm::checkBlank()
+{
+	if (!mBlankInterval || mIsBlanked) return;
+
+	if ((u32)time(0) - mLastActivity > mBlankInterval * 60) {
+		mIsBlanked = true;
+		Screen::instance()->blank(true);
 	}
 }
 
