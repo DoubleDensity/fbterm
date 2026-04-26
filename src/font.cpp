@@ -310,9 +310,10 @@ Font::Glyph *Font::getGlyph(u32 unicode)
 	s32 target_top = top;
 	s32 target_left = face->glyph->bitmap_left;
 
-	u32 optimal_h = (u32)(mHeight * 0.75f);
+	u32 optimal_h = (u32)(mHeight * 0.70f);
 	if (optimal_h == 0) optimal_h = 1;
 
+	// Respect the actual width fbterm expects for this character
 	u32 max_w = (face->glyph->advance.x > (mWidth << 6) * 1.5) ? mWidth * 2 : mWidth;
 
 	if (is_color_bitmap && (h > optimal_h || w > max_w)) {
@@ -326,6 +327,9 @@ Font::Glyph *Font::getGlyph(u32 unicode)
 		if (target_h == 0) target_h = 1;
 		target_top = (s32)mBaseline - (s32)(face->glyph->bitmap_top * scale_factor);
 		target_left = (s32)(target_left * scale_factor);
+
+		// Clamp left offset to prevent bleeding into previous cell
+		if (target_left < 0) target_left = 0;
 	}
 
 	u32 src_y_offset = 0;
