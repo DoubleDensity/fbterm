@@ -238,6 +238,7 @@ void Screen::drawText(u32 x, u32 y, u8 fc, u8 bc, u16 num, u32 *text, bool *dw)
 		if (*text == 0x20) {
 			if (draw_text) {
 				draw_text = false;
+				fillRect(startx, y, x - startx, FH(1), bc);
 				drawGlyphs(startx, y, fc, bc, startnum - num, starttext, startdw);
 			}
 
@@ -264,6 +265,7 @@ void Screen::drawText(u32 x, u32 y, u8 fc, u8 bc, u16 num, u32 *text, bool *dw)
 	}
 
 	if (draw_text) {
+		fillRect(startx, y, x - startx, FH(1), bc);
 		drawGlyphs(startx, y, fc, bc, startnum - num, starttext, startdw);
 	} else if (draw_space) {
 		fillRect(startx, y, x - startx, FH(1), bc);
@@ -308,10 +310,7 @@ void Screen::drawGlyph(u32 x, u32 y, u8 fc, u8 bc, u32 code, bool dw)
 	if (y + h > mHeight) h = mHeight - y;
 
 	Font::Glyph *glyph = (Font::Glyph *)Font::instance()->getGlyph(code);
-	if (!glyph) {
-		fillRect(x, y, w, h, bc);
-		return;
-	}
+	if (!glyph) return;
 
 	s32 top = glyph->top;
 	if (top < 0) top = 0;
@@ -328,17 +327,6 @@ void Screen::drawGlyph(u32 x, u32 y, u8 fc, u8 bc, u32 code, bool dw)
 	if (height > h - top) height = h - top;
 	if (y + top + height > mHeight) height = mHeight - (y + top);
 	if (height < 0) height = 0;
-
-	if (top) fillRect(x, y, w, top, bc);
-	if (left > 0) fillRect(x, y + top, left, height, bc);
-
-	s32 right = width + left;
-	if (w > right) fillRect((s32)x + right, y + top, w - right, height, bc);
-
-	s32 bot = top + height;
-	if (h > bot) fillRect(x, y + bot, w, h - bot, bc);
-
-	fillRect(x, y, w, h, bc); // Clear the entire allocated cell area
 
 	x += left;
 	y += top;

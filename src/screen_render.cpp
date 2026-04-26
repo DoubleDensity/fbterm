@@ -144,14 +144,17 @@ void Screen::draw8(u32 x, u32 y, u32 w, u8 fc, u8 bc, u8 *pixmap, bool is_color)
 	bool isfg;
 	u8 *dst = mVMemBase + y * mBytesPerLine + x * bytes_per_pixel;
 
-	for (; w--; dst++) {
-		if (is_color) {
+	if (is_color) {
+		for (; w--; dst++) {
 			pixmap += 3;
 			isfg = (*pixmap++ & 0x80);
-		} else {
-			isfg = (*pixmap++ & 0x80);
+			writeb(dst, fillColors[isfg ? fc : bc]);
 		}
-		writeb(dst, fillColors[isfg ? fc : bc]);
+	} else {
+		for (; w--; dst++) {
+			isfg = (*pixmap++ & 0x80);
+			writeb(dst, fillColors[isfg ? fc : bc]);
+		}
 	}
 }
 
@@ -167,14 +170,17 @@ void Screen::draw8Bg(u32 x, u32 y, u32 w, u8 fc, u8 bc, u8 *pixmap, bool is_colo
 	u8 *dst = mVMemBase + offset;
 	u8 *bgimg = bgimage_mem + offset;
 
-	for (; w--; dst++, bgimg++) {
-		if (is_color) {
+	if (is_color) {
+		for (; w--; dst++, bgimg++) {
 			pixmap += 3;
 			isfg = (*pixmap++ & 0x80);
-		} else {
-			isfg = (*pixmap++ & 0x80);
+			writeb(dst, isfg ? fillColors[fc] : (*bgimg));
 		}
-		writeb(dst, isfg ? fillColors[fc] : (*bgimg));
+	} else {
+		for (; w--; dst++, bgimg++) {
+			isfg = (*pixmap++ & 0x80);
+			writeb(dst, isfg ? fillColors[fc] : (*bgimg));
+		}
 	}
 }
 
@@ -187,8 +193,9 @@ void Screen::draw##bits(u32 x, u32 y, u32 w, u8 fc, u8 bc, u8 *pixmap, bool is_c
 	type color; \
 	type *dst = (type *)(mVMemBase + y * mBytesPerLine + x * bytes_per_pixel); \
  \
-	for (; w--; dst++) { \
-		if (is_color) { \
+	if (is_color) { \
+		u8 rbg = mPalette[bc].red, gbg = mPalette[bc].green, bluebg = mPalette[bc].blue; \
+		for (; w--; dst++) { \
 			blue = *pixmap++; \
 			green = *pixmap++; \
 			red = *pixmap++; \
@@ -199,19 +206,16 @@ void Screen::draw##bits(u32 x, u32 y, u32 w, u8 fc, u8 bc, u8 *pixmap, bool is_c
 				color = ((red >> (8 - lred) << (lgreen + lblue)) | (green >> (8 - lgreen) << lblue) | (blue >> (8 - lblue))); \
 				fbwrite(dst, color); \
 			} else { \
-				type bg_color = *dst; \
-				u8 rbg = ((bg_color >> (lgreen + lblue)) & ((1 << lred) - 1)) << (8 - lred); \
-				u8 gbg = ((bg_color >> lblue) & ((1 << lgreen) - 1)) << (8 - lgreen); \
-				u8 bbg = (bg_color & ((1 << lblue) - 1)) << (8 - lblue); \
- \
 				red = rbg + (((red - rbg) * alpha) >> 8); \
 				green = gbg + (((green - gbg) * alpha) >> 8); \
-				blue = bbg + (((blue - bbg) * alpha) >> 8); \
+				blue = bluebg + (((blue - bluebg) * alpha) >> 8); \
  \
 				color = ((red >> (8 - lred) << (lgreen + lblue)) | (green >> (8 - lgreen) << lblue) | (blue >> (8 - lblue))); \
 				fbwrite(dst, color); \
 			} \
-		} else { \
+		} \
+	} else { \
+		for (; w--; dst++) { \
 			pixel = *pixmap++; \
  \
 			if (!pixel) fbwrite(dst, fillColors[bc]); \
@@ -250,8 +254,8 @@ void Screen::draw##bits##Bg(u32 x, u32 y, u32 w, u8 fc, u8 bc, u8 *pixmap, bool 
 	type *dst = (type *)(mVMemBase + offset); \
 	type *bgimg = (type *)(bgimage_mem + offset); \
  \
-	for (; w--; dst++, bgimg++) { \
-		if (is_color) { \
+	if (is_color) { \
+		for (; w--; dst++, bgimg++) { \
 			blue = *pixmap++; \
 			green = *pixmap++; \
 			red = *pixmap++; \
@@ -279,7 +283,9 @@ void Screen::draw##bits##Bg(u32 x, u32 y, u32 w, u8 fc, u8 bc, u8 *pixmap, bool 
  \
 			color = ((redbg >> (8 - lred) << (lgreen + lblue)) | (greenbg >> (8 - lgreen) << lblue) | (bluebg >> (8 - lblue))); \
 			fbwrite(dst, color); \
-		} else { \
+		} \
+	} else { \
+		for (; w--; dst++, bgimg++) { \
 			pixel = *pixmap++; \
  \
 			if (!pixel) fbwrite(dst, *bgimg); \
