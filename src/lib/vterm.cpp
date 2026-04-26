@@ -46,11 +46,14 @@ VTerm::CharAttr VTerm::normal_char_attr()
 
 VTerm::CharAttr VTerm::erase_char_attr()
 {
-	CharAttr a(default_char_attr);
-
-	a.fcolor = char_attr.fcolor;
-	a.bcolor = char_attr.reverse ? char_attr.fcolor : char_attr.bcolor;  // Use effective background color to support BCE properly with reverse video
-	a.blink = char_attr.blink;
+	CharAttr a = char_attr;
+	if (a.reverse) {
+		u16 temp = a.bcolor;
+		a.bcolor = a.fcolor;
+		a.fcolor = temp;
+		a.reverse = 0;
+	}
+	a.type = CharAttr::Single;
 
 	return a;
 }

@@ -310,8 +310,11 @@ Font::Glyph *Font::getGlyph(u32 unicode)
 	s32 target_top = top;
 	s32 target_left = face->glyph->bitmap_left;
 
-	if (is_color_bitmap && (h > mBaseline || w > mWidth * 2)) {
-		float scale_factor = (float)mBaseline / h;
+	u32 optimal_h = (u32)(mHeight * 0.75f);
+	if (optimal_h == 0) optimal_h = 1;
+
+	if (is_color_bitmap && (h > optimal_h || w > mWidth * 2)) {
+		float scale_factor = (float)optimal_h / h;
 		if (w * scale_factor > mWidth * 2) {
 			scale_factor = (float)(mWidth * 2) / w;
 		}
