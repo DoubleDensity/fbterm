@@ -45,7 +45,7 @@ public :
 	void rotateRect(u32 &x, u32 &y, u32 &w, u32 &h);
 	void rotatePoint(u32 w, u32 h, u32 &x, u32 &y);
 
-	void drawText(u32 x, u32 y, u8 fc, u8 bc, u16 num, u16 *text, bool *dw);
+	void drawText(u32 x, u32 y, u8 fc, u8 bc, u16 num, u32 *text, bool *dw);
 	void fillRect(u32 x, u32 y, u32 w, u32 h, u8 color);
 
 	bool move(u16 scol, u16 srow, u16 dcol, u16 drow, u16 w, u16 h);
@@ -77,8 +77,8 @@ private:
 	virtual const s8 *drvId() = 0;
 
 	void eraseMargin(bool top, u16 h);
-	void drawGlyphs(u32 x, u32 y, u8 fc, u8 bc, u16 num, u16 *text, bool *dw);
-	void drawGlyph(u32 x, u32 y, u8 fc, u8 bc, u16 code, bool dw);
+	void drawGlyphs(u32 x, u32 y, u8 fc, u8 bc, u16 num, u32 *text, bool *dw);
+	void drawGlyph(u32 x, u32 y, u8 fc, u8 bc, u32 code, bool dw);
 	void adjustOffset(u32 &x, u32 &y);
 
 	void initFillDraw();

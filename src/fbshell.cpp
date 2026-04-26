@@ -364,7 +364,7 @@ FbShell::~FbShell()
 	if (mPalette) delete[] mPalette;
 }
 
-void FbShell::drawChars(CharAttr attr, u16 x, u16 y, u16 w, u16 num, u16 *chars, bool *dws)
+void FbShell::drawChars(CharAttr attr, u16 x, u16 y, u16 w, u16 num, u32 *chars, bool *dws)
 {
 	if (manager->activeShell() != this) return;
 
@@ -383,7 +383,7 @@ bool FbShell::moveChars(u16 sx, u16 sy, u16 dx, u16 dy, u16 w, u16 h)
 	return screen->move(sx, sy, dx, dy, w, h);
 }
 
-void FbShell::drawCursor(CharAttr attr, u16 x, u16 y, u16 c)
+void FbShell::drawCursor(CharAttr attr, u16 x, u16 y, u32 c)
 {
 	u16 oldX = mCursor.x, oldY = mCursor.y;
 
@@ -658,7 +658,7 @@ void FbShell::mouseInput(u16 x, u16 y, s32 type, s32 buttons)
 		adjustCharAttr(attr);
 
 		bool dw = (attr.type != CharAttr::Single);
-		u16 code = charCode(x, y);
+		u32 code = charCode(x, y);
 
 		if (attr.type == CharAttr::DoubleRight) x--;
 		screen->drawText(FW(x), FH(y), attr.bcolor, attr.fcolor, 1, &code, &dw);

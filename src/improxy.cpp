@@ -390,21 +390,24 @@ void ImProxy::doFillRect(Message *m)
 	Screen::instance()->fillRect(rect.x, rect.y, rect.w, rect.h, m->fillRect.color);
 }
 
-static void utf8_to_utf16(u8 *utf8, u16 *utf16, u16 &len)
+static void utf8_to_utf32(u8 *utf8, u32 *utf32, u16 &len)
 {
 	u8 *end = utf8 + len;
 	len = 0;
 
 	for (; utf8 < end;) {
 		if ((*utf8 & 0x80) == 0) {
-			utf16[len++] = *utf8;
+			utf32[len++] = *utf8;
 			utf8++;
 		} else if ((*utf8 & 0xe0) == 0xc0) {
-			utf16[len++] = ((*utf8 & 0x1f) << 6) | (utf8[1] & 0x3f);
+			utf32[len++] = ((*utf8 & 0x1f) << 6) | (utf8[1] & 0x3f);
 			utf8 += 2;
 		} else if ((*utf8 & 0xf0) == 0xe0) {
-			utf16[len++] = ((*utf8 & 0xf) << 12) | ((utf8[1] & 0x3f) << 6) | (utf8[2] & 0x3f);
+			utf32[len++] = ((*utf8 & 0xf) << 12) | ((utf8[1] & 0x3f) << 6) | (utf8[2] & 0x3f);
 			utf8 += 3;
+		} else if ((*utf8 & 0xf8) == 0xf0) {
+			utf32[len++] = ((*utf8 & 0x7) << 18) | ((utf8[1] & 0x3f) << 12) | ((utf8[2] & 0x3f) << 6) | (utf8[3] & 0x3f);
+			utf8 += 4;
 		} else utf8++;
 	}
 }
@@ -416,17 +419,17 @@ void ImProxy::doDrawText(Message *m)
 	u16 len = m->len - OFFSET(Message, drawText.texts);
 	u8 *utf8 = (u8 *)(m->drawText.texts);
 
-	u16 utf16[len];
-	utf8_to_utf16(utf8, utf16, len);
+	u32 utf32[len];
+	utf8_to_utf32(utf8, utf32, len);
 
 	if (!len) return;
 
 	bool dws[len];
 	for (u16 i = 0; i < len; i++) {
-		dws[i] = (VTerm::charWidth(utf16[i]) == 2);
+		dws[i] = (VTerm::charWidth(utf32[i]) == 2);
 	}
 
-	Screen::instance()->drawText(m->drawText.x, m->drawText.y, m->drawText.fc, m->drawText.bc, len, utf16, dws);
+	Screen::instance()->drawText(m->drawText.x, m->drawText.y, m->drawText.fc, m->drawText.bc, len, utf32, dws);
 }
 
 void ImProxy::waitImMessage(u32 type)

@@ -583,7 +583,7 @@ void VTerm::expose(u16 x, u16 y, u16 w, u16 h)
 
 		CharAttr attr = attrs[yp + startx];
 		bool dws[width];
-		u16 codes[width], num = 0;
+		u32 codes[width], num = 0;
 		u16 cur, start = startx;
 
 		for (cur = startx; cur <= endx; cur++) {

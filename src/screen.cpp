@@ -197,11 +197,12 @@ void Screen::eraseMargin(bool top, u16 h)
 	}
 }
 
-void Screen::drawText(u32 x, u32 y, u8 fc, u8 bc, u16 num, u16 *text, bool *dw)
+void Screen::drawText(u32 x, u32 y, u8 fc, u8 bc, u16 num, u32 *text, bool *dw)
 {
 	u32 startx, fw = FW(1);
 
-	u16 startnum, *starttext;
+	u16 startnum;
+	u32 *starttext;
 	bool *startdw, draw_space = false, draw_text = false;
 
 	for (; num; num--, text++, dw++, x += fw) {
@@ -240,7 +241,7 @@ void Screen::drawText(u32 x, u32 y, u8 fc, u8 bc, u16 num, u16 *text, bool *dw)
 	}
 }
 
-void Screen::drawGlyphs(u32 x, u32 y, u8 fc, u8 bc, u16 num, u16 *text, bool *dw)
+void Screen::drawGlyphs(u32 x, u32 y, u8 fc, u8 bc, u16 num, u32 *text, bool *dw)
 {
 	for (; num--; text++, dw++) {
 		drawGlyph(x, y, fc, bc, *text, *dw);
@@ -269,7 +270,7 @@ void Screen::fillRect(u32 x, u32 y, u32 w, u32 h, u8 color)
 	}
 }
 
-void Screen::drawGlyph(u32 x, u32 y, u8 fc, u8 bc, u16 code, bool dw)
+void Screen::drawGlyph(u32 x, u32 y, u8 fc, u8 bc, u32 code, bool dw)
 {
 	if (x >= mWidth || y >= mHeight) return;
 
