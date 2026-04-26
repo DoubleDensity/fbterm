@@ -295,9 +295,6 @@ void VTerm::input(const u8 *buf, u32 count)
 		changed_line(cursor_y, cursor_x, cursor_x);
 	}
 
-	// Enable batch mode for jump scrolling optimization
-	setBatchMode(true);
-
 	u32 c, tc;
 	bool rescan;
 
