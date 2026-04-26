@@ -652,39 +652,6 @@ void VTerm::begin_set_palette()
 	else palette_mode = true;
 }
 
-void VTerm::reset()
-{
-	utf8 = true;
-	utf8_count = 0;
-	g0_is_active = true;
-	g0_charset = Lat1Map;
-	g1_charset = GrafMap;
-	charset = g0_charset;
-
-	esc_state = ESnormal;
-	mExpectST = false;
-
-	pending_scroll = 0;
-	scroll_top = 0;
-	scroll_bot = height ? (height - 1) : 0;
-	cursor_x = cursor_y = 0;
-	s_cursor_x = s_cursor_y = 0;
-
-	mode_flags = ModeFlag();
-	char_attr = s_char_attr = default_char_attr;
-	cur_fcolor = default_char_attr.fcolor;
-	cur_bcolor = default_char_attr.bcolor;
-	cur_underline_color = -1;
-	cur_halfbright_color = -1;
-
-	if (text) {
-		memset(tab_stops, 0, max_width / 8 + 1);
-		clear_area(0, 0, width - 1, height - 1);
-	}
-
-	modeChanged(AllModes);
-}
-
 void VTerm::set_palette()
 {
 	if (palette_mode) {
