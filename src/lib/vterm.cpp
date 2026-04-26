@@ -725,25 +725,6 @@ void VTerm::clear_area(u16 start_x, u16 start_y, u16 end_x, u16 end_y)
 	}
 }
 
-void VTerm::clear_area(u16 start_x, u16 start_y, u16 end_x, u16 end_y)
-{
-	if (start_x >= width || start_y >= height) return;
-	if (end_x >= width) end_x = width - 1;
-	if (end_y >= height) end_y = height - 1;
-	if (start_x > end_x || start_y > end_y) return;
-
-	u16 x, y;
-	u32 yp;
-	for (y=start_y; y<=end_y; y++) {
-		yp = linenumbers[y]*max_width;
-		for (x=start_x; x<=end_x; x++) {
-			text[yp+x]= ' ';
-			attrs[yp+x] = erase_char_attr();
-		}
-		changed_line(y, start_x, end_x);
-	}
-}
-
 void VTerm::changed_line(u16 y, u16 start_x, u16 end_x)
 {
 	if (y >= height) return;
