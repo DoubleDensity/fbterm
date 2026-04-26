@@ -49,7 +49,7 @@ VTerm::CharAttr VTerm::erase_char_attr()
 	CharAttr a(default_char_attr);
 
 	a.fcolor = char_attr.fcolor;
-	a.bcolor = char_attr.bcolor;  // Use current background color to support BCE (Background Color Erase)
+	a.bcolor = char_attr.reverse ? char_attr.fcolor : char_attr.bcolor;  // Use effective background color to support BCE properly with reverse video
 	a.blink = char_attr.blink;
 
 	return a;
