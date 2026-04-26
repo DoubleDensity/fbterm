@@ -237,6 +237,8 @@ void FbTerm::activityOccurred()
 	if (mIsBlanked) {
 		mIsBlanked = false;
 		Screen::instance()->blank(false);
+		Screen::instance()->switchVc(true);
+		FbShellManager::instance()->redraw(0, 0, Screen::instance()->cols(), Screen::instance()->rows());
 	}
 }
 
